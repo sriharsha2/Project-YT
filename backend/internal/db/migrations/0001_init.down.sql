@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS video_stats;
+DROP TABLE IF EXISTS videos;
+DROP TABLE IF EXISTS channels;
+DROP TYPE IF EXISTS video_status;

@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # One-off: `docker compose --profile tools run --rm migrate up`. Never runs on `up`,
+  # so schema changes are always applied deliberately.
+  migrate:
+    image: migrate/migrate:v4.18.3
+    profiles: ["tools"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/internal/db/migrations:/migrations:ro
+    entrypoint: ["migrate", "-path", "/migrations", "-database", "${DATABASE_URL}"]
+
+  api:
+    build:
+      context: ./backend
+      target: api
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  pgdata:

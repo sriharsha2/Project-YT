@@ -1,0 +1,55 @@
+name: backend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Install (frozen)
+        run: go mod download && go mod verify && git diff --exit-code go.mod go.sum
+
+      - name: Format check
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.4.0
+          working-directory: backend
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Tests with 100% coverage gate
+        run: bash scripts/check-coverage.sh
+
+      - name: Dependency vulnerability audit
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 ./...
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        run: docker build --target api -t ytauto-api:ci .
