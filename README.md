@@ -187,10 +187,10 @@ You should see `1/u init`. Running it again prints `no change`, which is fine.
 ### 5. Check that it works
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:8081/health
 # {"status":"ok"}
 
-curl http://localhost:8080/ready
+curl http://localhost:8081/ready
 # {"status":"ok","checks":{"postgres":"ok","redis":"ok"}}
 ```
 
@@ -302,7 +302,7 @@ New migrations go in `backend/internal/db/migrations/` as a pair named `NNNN_nam
 | Symptom | Cause and fix |
 |---------|---------------|
 | `open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified` | Docker Desktop is not running. Start it and wait for *Engine running*. |
-| `Bind for 127.0.0.1:5432 failed: port is already allocated` (or 6379, 8080) | Another Postgres, Redis or app is using the port. Stop it, or change the left-hand port in `docker-compose.yml`. |
+| `Bind for 127.0.0.1:5432 failed: port is already allocated` (or 6379, 8081) | Another Postgres, Redis or app is using the port. Stop it, or change the left-hand port in `docker-compose.yml`. |
 | API exits with `invalid configuration: DATABASE_URL is required ...` | A required variable is missing. For Docker, check `.env`; for Option B, check the variables exported in your terminal. |
 | `/ready` shows `"postgres":"unavailable"` | The password in `DATABASE_URL` doesn't match `POSTGRES_PASSWORD`, or you used host `postgres` outside Docker (use `localhost`). Postgres only reads its password on **first** start. If you changed it later, run `docker compose down -v` to reset. |
 | `/ready` shows `"redis":"unavailable"` | Redis isn't running (`docker compose up -d redis`), or `REDIS_ADDR` has the wrong host (`redis:6379` inside Docker, `localhost:6379` outside). |
