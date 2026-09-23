@@ -77,7 +77,7 @@ Engineering rules for every change are in [skills.md](skills.md).
 |------|---------|------------|-----------|
 | [Git](https://git-scm.com/downloads) | any recent | cloning, committing | yes |
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose v2 on Linux) | Compose v2 | running Postgres, Redis and the API | yes |
-| [Go](https://go.dev/dl/) | **1.24** or newer | building and testing the backend | for development |
+| [Go](https://go.dev/dl/) | **1.25.13** or newer | building and testing the backend | for development |
 | [golangci-lint](https://golangci-lint.run/) | **v2.4.0** | lint and complexity checks | for development |
 | Bash | any | running `scripts/check-coverage.sh` (Git Bash on Windows) | for development |
 | curl | any | checking the endpoints (included in Windows 10+, macOS and most Linux distros) | optional |
@@ -123,7 +123,7 @@ export PATH="$PATH:$(go env GOPATH)/bin"   # add this line to ~/.zshrc to make i
 sudo apt update && sudo apt install -y git curl
 # Docker Engine + Compose plugin: https://docs.docker.com/engine/install/ubuntu/
 sudo usermod -aG docker "$USER"   # then log out and back in so docker works without sudo
-# Go 1.24+: https://go.dev/doc/install (the distro package is often too old)
+# Go 1.25.13+: https://go.dev/doc/install (the distro package is often too old)
 go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.4.0
 export PATH="$PATH:$(go env GOPATH)/bin"
 ```
@@ -134,7 +134,7 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 git --version
 docker version              # must show both "Client" and "Server" sections
 docker compose version      # must be v2.x
-go version                  # go1.24 or newer
+go version                  # go1.25.13 or newer
 golangci-lint --version     # 2.4.0
 ```
 
@@ -308,7 +308,7 @@ New migrations go in `backend/internal/db/migrations/` as a pair named `NNNN_nam
 | `/ready` shows `"redis":"unavailable"` | Redis isn't running (`docker compose up -d redis`), or `REDIS_ADDR` has the wrong host (`redis:6379` inside Docker, `localhost:6379` outside). |
 | `migrate` fails with `relation ... already exists` / `Dirty database version` | A migration failed halfway. Run `migrate force <last-good-version>`, then `migrate up`. Locally, `docker compose down -v` is the simplest reset. |
 | `golangci-lint: command not found` | Add Go's bin folder to `PATH`: `%USERPROFILE%\go\bin` on Windows, `$(go env GOPATH)/bin` on macOS/Linux. |
-| `go: ... requires go >= 1.25` | You tried to upgrade a dependency past what Go 1.24 supports. Pin the older version, or install a newer Go and bump the `go` line in `go.mod`. |
+| `go: ... requires go >= 1.26` | You tried to upgrade a dependency past what Go 1.25 supports. Pin the older version, or install a newer Go and bump the `go` line in `go.mod`. |
 | `git push` fails with `Password authentication is not supported` | GitHub needs a browser login or a personal access token, not your password. Remove the saved `git:https://github.com` entry in Windows Credential Manager, then push again and sign in through the browser window that opens. |
 
 ### Configuration
