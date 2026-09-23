@@ -1,0 +1,62 @@
+# Enforces the size, complexity and smell limits from skills.md §3.
+version: "2"
+
+linters:
+  enable:
+    - funlen
+    - gocyclo
+    - gocognit
+    - nestif
+    - lll
+    - dupl
+    - revive
+    - mnd
+    - errorlint
+    - bodyclose
+    - noctx
+    - gosec
+    - godox
+    - misspell
+    - unparam
+    - nolintlint
+  settings:
+    funlen:
+      lines: 40
+      statements: -1
+    gocyclo:
+      min-complexity: 10
+    gocognit:
+      min-complexity: 15
+    nestif:
+      min-complexity: 3
+    lll:
+      line-length: 120
+    dupl:
+      threshold: 100
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    godox:
+      keywords: [FIXME, HACK]
+    revive:
+      rules:
+        - name: argument-limit
+          arguments: [4]
+        - name: max-public-structs
+          arguments: [10]
+        - name: flag-parameter
+        - name: exported
+        - name: unused-parameter
+  exclusions:
+    rules:
+      # Table-driven tests are intentionally long and repetitive.
+      - path: _test\.go
+        linters: [funlen, dupl, mnd, gocognit]
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes: [github.com/sriharsha2/Project-YT]
